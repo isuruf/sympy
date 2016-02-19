@@ -1515,6 +1515,9 @@ def test_nth_linear_constant_coeff_homogeneous_rootof():
         C3*exp(x*rootof(x**5 + 11*x - 2, 2)) +
         C4*exp(x*rootof(x**5 + 11*x - 2, 3)) +
         C5*exp(x*rootof(x**5 + 11*x - 2, 4)))
+    print()
+    print(dsolve(eq).args)
+    print(sol.args)
     assert dsolve(eq) == sol
 
 
