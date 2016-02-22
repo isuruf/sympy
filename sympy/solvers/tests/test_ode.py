@@ -1510,14 +1510,11 @@ def test_nth_linear_constant_coeff_homogeneous():
 def test_nth_linear_constant_coeff_homogeneous_rootof():
     eq = f(x).diff(x, 5) + 11*f(x).diff(x) - 2*f(x)
     sol = Eq(f(x),
-        C1*exp(x*rootof(x**5 + 11*x - 2, 0)) +
-        C2*exp(x*rootof(x**5 + 11*x - 2, 1)) +
-        C3*exp(x*rootof(x**5 + 11*x - 2, 2)) +
-        C4*exp(x*rootof(x**5 + 11*x - 2, 3)) +
-        C5*exp(x*rootof(x**5 + 11*x - 2, 4)))
-    print()
-    print(dsolve(eq).args)
-    print(sol.args)
+        C1*exp(x*rootof(x**5 + 11*x - 2, 2)) +
+        C2*exp(x*rootof(x**5 + 11*x - 2, 3)) +
+        C3*exp(x*rootof(x**5 + 11*x - 2, 4)) +
+        C4*exp(x*rootof(x**5 + 11*x - 2, 0)) +
+        C5*exp(x*rootof(x**5 + 11*x - 2, 1)))
     assert dsolve(eq) == sol
 
 
