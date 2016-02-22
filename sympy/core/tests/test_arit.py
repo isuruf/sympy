@@ -1892,3 +1892,26 @@ def test_issue_8247_8354():
 def test_Add_is_zero():
     x, y = symbols('x y', zero=True)
     assert (x + y).is_zero
+
+
+def test_special_case_ones():
+    z = S('0.0')
+    # Python controls these
+    assert 1*z == z
+    assert -1*z == z
+    # SymPy controls these
+    assert -S('0.0') is S.Zero
+    assert S(1)*z is S.Zero
+    assert S(-1)*z is S.Zero
+    assert z*S(1) is S.Zero
+    assert z*S(-1) is S.Zero
+    assert z/S(1) is S.Zero
+    assert z/S(-1) is S.Zero
+
+    h = S.Half
+    assert S(1)*h is S.Half
+    assert S(-1)*h == -S.Half
+    assert h*S(1) is S.Half
+    assert h*S(-1) == -S.Half
+    assert h/S(1) is S.Half
+    assert h/S(-1) == -S.Half

@@ -231,6 +231,8 @@ class Pow(Expr):
     def _eval_power(self, other):
         from sympy import Abs, arg, exp, floor, im, log, re, sign, refine
         b, e = self.as_base_exp()
+        if other is S.NegativeOne:
+            return Pow(b, -e)
         if b is S.NaN:
             return (b**e)**other  # let __new__ handle it
 

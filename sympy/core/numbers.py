@@ -939,6 +939,10 @@ class Float(Number):
 
     @_sympifyit('other', NotImplemented)
     def __mul__(self, other):
+        if other is S.One:
+            return self or S.Zero
+        if other is S.NegativeOne:
+            return -self
         if isinstance(other, Number):
             rhs, prec = other._as_mpf_op(self._prec)
             return Float._new(mlib.mpf_mul(self._mpf_, rhs, prec, rnd), prec)
@@ -946,6 +950,10 @@ class Float(Number):
 
     @_sympifyit('other', NotImplemented)
     def __div__(self, other):
+        if other is S.One:
+            return self or S.Zero
+        if other is S.NegativeOne:
+            return -self
         if isinstance(other, Number) and other != 0:
             rhs, prec = other._as_mpf_op(self._prec)
             return Float._new(mlib.mpf_div(self._mpf_, rhs, prec, rnd), prec)
@@ -1388,11 +1396,11 @@ class Rational(Number):
 
     @_sympifyit('other', NotImplemented)
     def __mul__(self, other):
-        if self is S.One:
-            return other or S.Zero
-        if other is S.One:
-            return self or S.Zero
         if isinstance(other, Rational):
+            if other is S.One:
+                return self
+            if other is S.NegativeOne:
+                return -self
             return Rational(self.p*other.p, self.q*other.q)
         elif isinstance(other, Float):
             return other*self
@@ -1402,6 +1410,10 @@ class Rational(Number):
     @_sympifyit('other', NotImplemented)
     def __div__(self, other):
         if isinstance(other, Rational):
+            if other is S.One:
+                return self
+            if other is S.NegativeOne:
+                return -self
             if self.p and other.p == S.Zero:
                 return S.ComplexInfinity
             else:
@@ -2291,6 +2303,10 @@ class One(with_metaclass(Singleton, IntegerConstant)):
     def __neg__():
         return S.NegativeOne
 
+    @_sympifyit('other', NotImplemented)
+    def __mul__(self, other):
+        return other or S.Zero
+
     def _eval_power(self, expt):
         return self
 
@@ -2342,6 +2358,10 @@ class NegativeOne(with_metaclass(Singleton, IntegerConstant)):
     @staticmethod
     def __neg__():
         return S.One
+
+    @_sympifyit('other', NotImplemented)
+    def __mul__(self, other):
+        return -other
 
     def _eval_power(self, expt):
         if expt.is_odd:
