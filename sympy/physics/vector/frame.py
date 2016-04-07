@@ -1,5 +1,13 @@
-from sympy import (diff, trigsimp, expand, sin, cos, solve, Symbol, sympify,
-                   eye, symbols, Dummy, ImmutableMatrix as Matrix)
+import os
+if os.environ.get('USE_SYMENGINE'):
+    import symengine as sm
+    from symengine import Matrix, sin, cos, diff, eye, expand, symbols, sympify
+else:
+    import sympy as sm
+    from sympy import ImmutableMatrix as Matrix, sin, cos, diff, eye, expand, symbols, sympify
+
+
+from sympy import (trigsimp, solve, Symbol, Dummy)
 from sympy.core.compatibility import string_types, u, range
 from sympy.physics.vector.vector import Vector, _check_vector
 

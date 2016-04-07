@@ -1,5 +1,12 @@
-from sympy import (S, sympify, trigsimp, expand, sqrt, Add, zeros,
-                   ImmutableMatrix as Matrix)
+import os
+if os.environ.get('USE_SYMENGINE'):
+    import symengine as sm
+    from symengine import Add, zeros, Integer, sqrt, expand, Matrix, sympify
+else:
+    import sympy as sm
+    from sympy import Add, zeros, Integer, sqrt, expand, ImmutableMatrix as Matrix, sympify
+
+from sympy import trigsimp
 from sympy.core.compatibility import u, unicode
 from sympy.utilities.misc import filldedent
 
@@ -97,7 +104,7 @@ class Vector(object):
         if isinstance(other, Dyadic):
             return NotImplemented
         other = _check_vector(other)
-        out = S(0)
+        out = sympify(0)
         for i, v1 in enumerate(self.args):
             for j, v2 in enumerate(other.args):
                 out += ((v2[0].T)

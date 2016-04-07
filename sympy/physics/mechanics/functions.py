@@ -456,7 +456,11 @@ def msubs(expr, *sub_dicts, **kwargs):
     fraction is attempted. Using this selective simplification, only
     subexpressions that result in 1/0 are targeted, resulting in faster
     performance."""
-
+    import os
+    if os.environ.get('USE_SYMENGINE'):
+        from symengine import Matrix
+    else:
+        from sympy import Matrix
     sub_dict = dict_merge(*sub_dicts)
     smart = kwargs.pop('smart', False)
     if smart:

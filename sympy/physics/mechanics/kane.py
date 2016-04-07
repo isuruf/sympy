@@ -2,7 +2,16 @@ from __future__ import print_function, division
 
 __all__ = ['KanesMethod']
 
-from sympy import zeros, Matrix, diff, solve_linear_system_LU, eye
+import os
+if os.environ.get('USE_SYMENGINE'):
+    import symengine as sm
+    from symengine import zeros, Matrix, diff, eye
+else:
+    import sympy as sm
+    from sympy import zeros, Matrix, diff, eye
+
+from sympy import solve_linear_system_LU
+
 from sympy.core.compatibility import range
 from sympy.utilities import default_sort_key
 from sympy.physics.vector import (ReferenceFrame, dynamicsymbols,
