@@ -15,7 +15,7 @@ from .cache import cacheit, clear_cache
 from .logic import fuzzy_not
 from sympy.core.compatibility import (
     as_int, integer_types, long, string_types, with_metaclass, HAS_GMPY,
-    SYMPY_INTS)
+    SYMPY_INTS, SYMPY_MPZ as mpz)
 import mpmath
 import mpmath.libmp as mlib
 from mpmath.libmp import mpf_pow, mpf_pi, mpf_e, phi_fixed
@@ -58,7 +58,7 @@ def comp(z1, z2, tol=None):
             if type(z2) is str and getattr(z1, 'is_Number', False):
                 return str(z1) == z2
             a, b = Float(z1), Float(z2)
-            return int(abs(a - b)*10**prec_to_dps(
+            return mpz(abs(a - b)*10**prec_to_dps(
                 min(a._prec, b._prec)))*2 <= 1
         elif all(getattr(i, 'is_Number', False) for i in (z1, z2)):
             return z1._prec == z2._prec and str(z1) == str(z2)
@@ -120,7 +120,7 @@ def _decimal_to_Rational_prec(dec):
     s, d, e = dec.as_tuple()
     prec = len(d)
     if e >= 0:  # it's an integer
-        rv = Integer(int(dec))
+        rv = Integer(mpz(dec))
     else:
         s = (-1)**s
         d = sum([di*10**i for i, di in enumerate(reversed(d))])
@@ -375,7 +375,7 @@ class Number(AtomicExpr):
             return Tuple(*divmod(self.p, other.p))
         else:
             rat = self/other
-        w = sign(rat)*int(abs(rat))  # = rat.floor()
+        w = sign(rat)*mpz(abs(rat))  # = rat.floor()
         r = self - other*w
         return Tuple(w, r)
 
@@ -865,11 +865,11 @@ class Float(Number):
         return (self._mpf_, self._prec)
 
     def floor(self):
-        return Integer(int(mlib.to_int(
+        return Integer(mpz(mlib.to_int(
             mlib.mpf_floor(self._mpf_, self._prec))))
 
     def ceiling(self):
-        return Integer(int(mlib.to_int(
+        return Integer(mpz(mlib.to_int(
             mlib.mpf_ceil(self._mpf_, self._prec))))
 
     @property
@@ -1235,7 +1235,7 @@ class Rational(Number):
                 try:
                     # we might have a Float
                     neg_pow, digits, expt = decimal.Decimal(p).as_tuple()
-                    p = [1, -1][neg_pow]*int("".join(str(x) for x in digits))
+                    p = [1, -1][neg_pow]*mpz("".join(str(x) for x in digits))
                     if expt > 0:
                         return Rational(p*Pow(10, expt), 1)
                     return Rational(p, Pow(10, -expt))
@@ -1243,7 +1243,7 @@ class Rational(Number):
                     f = regex.match('^([-+]?[0-9]+)/([0-9]+)$', p)
                     if f:
                         n, d = f.groups()
-                        return Rational(int(n), int(d))
+                        return Rational(mpz(n), mpz(d))
                     elif p.count('/') == 1:
                         p, q = p.split('/')
                         return Rational(Rational(p), Rational(q))
@@ -1759,7 +1759,10 @@ class Integer(Rational):
         # let the int routines determine whether the expression can
         # be made into an int or whether an error should be raised.
         try:
-            ival = int(i)
+            if isinstance(i, Integer):
+                ival = i.p
+            else:
+                ival = mpz(int(i))
         except TypeError:
             raise TypeError(
                 'Integer can only work with integer expressions.')
@@ -1779,7 +1782,7 @@ class Integer(Rational):
 
     # Arithmetic operations are here for efficiency
     def __int__(self):
-        return self.p
+        return int(self.p)
 
     __long__ = __int__
 
@@ -1926,7 +1929,7 @@ class Integer(Rational):
         return hash(self.p)
 
     def __index__(self):
-        return self.p
+        return int(self.p)
 
     ########################################
 

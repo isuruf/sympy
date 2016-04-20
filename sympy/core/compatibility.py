@@ -329,7 +329,10 @@ def as_int(n):
 
     """
     try:
-        result = int(n)
+        if isinstance(n, SYMPY_INTS):
+            result = SYMPY_MPZ(n)
+        else:
+            result = SYMPY_MPZ(int(n))
         if result != n:
             raise TypeError
     except TypeError:
@@ -680,8 +683,17 @@ if GROUND_TYPES == 'gmpy' and not HAS_GMPY:
 # SYMPY_INTS is a tuple containing the base types for valid integer types.
 SYMPY_INTS = integer_types
 
+def to_mpz(i):
+    try:
+        return gmpy.mpz(i)
+    except TypeError:
+        return gmpy.mpz(int(i))
+
 if GROUND_TYPES == 'gmpy':
     SYMPY_INTS += (type(gmpy.mpz(0)),)
+    SYMPY_MPZ = to_mpz
+else:
+    SYMPY_MPZ = int
 
 
 # lru_cache compatible with py2.6->py3.2 copied directly from
