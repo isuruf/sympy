@@ -466,7 +466,10 @@ def msubs(expr, *sub_dicts, **kwargs):
     if smart:
         func = _smart_subs
     else:
-        func = lambda expr, sub_dict: _crawl(expr, _sub_func, sub_dict)
+        if os.environ.get('USE_SYMENGINE'):
+            func = lambda expr, sub_dict: expr.msubs(sub_dict)
+        else:
+            func = lambda expr, sub_dict: _crawl(expr, _sub_func, sub_dict)
     if isinstance(expr, (Matrix, Vector, Dyadic)):
         return expr.applyfunc(lambda x: func(x, sub_dict))
     else:
