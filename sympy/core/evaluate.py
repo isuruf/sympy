@@ -19,7 +19,7 @@ class _global_distribute(list):
 
 
 global_evaluate = _global_evaluate([True])
-global_distribute = _global_distribute([True])
+global_distribute = _global_distribute([False])
 
 
 @contextmanager
