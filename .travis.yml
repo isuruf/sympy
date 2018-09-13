@@ -241,8 +241,10 @@ before_install:
         conda clean --all;
         if [[ "$TEST_SAGE" == "true" ]]; then
             # Use a separate environment because sage downgrades matplotlib
-            conda create -n sage sagelib;
-            # conda remove -n sage --force sympy;
+            conda create -n sage sagelib=8.1;
+            conda clean --all;
+            conda install sage=8.1 -n sage;
+            conda remove -n sage --force sympy;
             conda clean --all;
         fi
         if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then
