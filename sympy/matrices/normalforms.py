@@ -63,7 +63,9 @@ def invariant_factors(m, domain=None, full=False):
             domain = m.ring
 
     if len(m) == 0:
-        return (), s, t
+        if full:
+            return (), m, m
+        return ()
 
     m = m[:, :]
     if full:
