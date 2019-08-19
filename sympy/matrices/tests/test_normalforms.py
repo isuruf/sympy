@@ -29,4 +29,3 @@ def test_smith_normal():
     setattr(m, "ring", QQ)
     snf, s, t = smith_normal_form(m, full=True)
     assert snf == s*m*t
-
