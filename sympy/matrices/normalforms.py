@@ -45,7 +45,7 @@ def smith_normal_form(m, domain=None, full=False):
 
 def invariant_factors(m, domain=None, full=False):
     '''
-    Return the tuple of abelian invariants for a matrix `m`
+    Return the tuple of abelian invariants for a matrix ``m``
     (as in the Smith-Normal form)
 
     References
@@ -146,7 +146,7 @@ def invariant_factors(m, domain=None, full=False):
         if ind:
             m = m.permute_cols([[0, ind[0]]])
             if full:
-                t = t.permute_rows([[0, ind[0]]])
+                t = t.permute_cols([[0, ind[0]]])
 
     # make the first row and column except m[0,0] zero
     while (any([m[0,i] != 0 for i in range(1,m.cols)]) or
