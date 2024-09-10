@@ -2081,6 +2081,29 @@ class Basic(Printable):
 
     _constructor_postprocessor_mapping = {}  # type: ignore
 
+    @cacheit
+    def _get_postprocessors(cls, clsname, arg_type):
+        # Since only Add, Mul, Pow can be clsname, this cache
+        # is not quadratic.
+        postprocessors = set()
+        try:
+            mappings = Basic._get_postprocessors_for_type(cls, arg_type)
+            for mapping in mappings:
+                f = mapping.get(clsname, None)
+                if f is not None:
+                    postprocessors.add(f)
+        except TypeError:
+            pass
+        return postprocessors
+
+    @cacheit
+    def _get_postprocessors_for_type(cls, arg_type):
+        return (
+            Basic._constructor_postprocessor_mapping[cls].items()
+            for cls in arg_type.mro()
+            if cls in Basic._constructor_postprocessor_mapping
+        )
+
     @classmethod
     def _exec_constructor_postprocessors(cls, obj):
         # WARNING: This API is experimental.
@@ -2092,20 +2115,12 @@ class Basic(Printable):
         # functions for matching expression node names.
 
         clsname = obj.__class__.__name__
-        postprocessors = defaultdict(list)
+        postprocessors = set()
         for i in obj.args:
-            try:
-                postprocessor_mappings = (
-                    Basic._constructor_postprocessor_mapping[cls].items()
-                    for cls in type(i).mro()
-                    if cls in Basic._constructor_postprocessor_mapping
-                )
-                for k, v in chain.from_iterable(postprocessor_mappings):
-                    postprocessors[k].extend([j for j in v if j not in postprocessors[k]])
-            except TypeError:
-                pass
+            for f in _get_postprocessors(clsname, type(i)):
+                postprocessors.add(f)
 
-        for f in postprocessors.get(clsname, []):
+        for f in postprocessors:
             obj = f(obj)
 
         return obj
