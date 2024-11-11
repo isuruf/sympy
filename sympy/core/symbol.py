@@ -258,7 +258,7 @@ class Symbol(AtomicExpr, Boolean):
 
     is_comparable = False
 
-    __slots__ = ('name', '_assumptions_orig', '_assumptions0')
+    __slots__ = ('name', '_assumptions_orig', '_assumptions0', '_mhashable_content')
 
     name: str
 
@@ -363,7 +363,8 @@ class Symbol(AtomicExpr, Boolean):
 
         obj._assumptions = assumptions_kb
         obj._assumptions_orig = assumptions_orig
-        obj._assumptions0 = assumptions0
+        obj._assumptions0 = tuple(sorted(assumptions0.items()))
+        obj._mhashable_content = None
 
         # The three assumptions dicts are all a little different:
         #
@@ -402,8 +403,9 @@ class Symbol(AtomicExpr, Boolean):
             setattr(self, name, value)
 
     def _hashable_content(self):
-        # Note: user-specified assumptions not hashed, just derived ones
-        return (self.name,) + tuple(sorted(self.assumptions0.items()))
+        if self._mhashable_content is None:
+            self._mhashable_content = (self.name,) + self._assumptions0
+        return self._mhashable_content
 
     def _eval_subs(self, old, new):
         if old.is_Pow:
@@ -415,7 +417,7 @@ class Symbol(AtomicExpr, Boolean):
 
     @property
     def assumptions0(self):
-        return self._assumptions0.copy()
+        return dict(self._assumptions0)
 
     @cacheit
     def sort_key(self, order=None):
